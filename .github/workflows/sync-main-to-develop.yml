@@ -48,6 +48,7 @@ jobs:
         if: steps.compare.outputs.ahead_by != '0'
         env:
           GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
           TITLE: Sync main to develop
           BODY: |
             ## Summary
@@ -63,6 +64,7 @@ jobs:
 
           existing_pr="$(
             gh pr list \
+              --repo "${REPOSITORY}" \
               --base develop \
               --head main \
               --state open \
@@ -72,11 +74,13 @@ jobs:
 
           if [ -n "${existing_pr}" ]; then
             gh pr edit "${existing_pr}" \
+              --repo "${REPOSITORY}" \
               --title "${TITLE}" \
               --body "${BODY}"
             echo "Updated existing sync PR #${existing_pr}."
           else
             gh pr create \
+              --repo "${REPOSITORY}" \
               --base develop \
               --head main \
               --title "${TITLE}" \
