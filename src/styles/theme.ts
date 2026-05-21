@@ -1,6 +1,17 @@
-import { fontFamily, fontWeight, pxToRem, radius, spacing, typography } from './tokens';
+import {
+  color,
+  colorPrimitive,
+  fontFamily,
+  fontWeight,
+  pxToRem,
+  radius,
+  spacing,
+  typography,
+} from './tokens';
 
 export const theme = {
+  color,
+  colorPrimitive,
   fontFamily,
   fontWeight,
   pxToRem,

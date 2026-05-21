@@ -1,5 +1,7 @@
 import { css } from '@emotion/react';
 
+import { color, colorModeCssVariables } from './tokens';
+
 export const globalStyles = css`
   @font-face {
     font-family: "Pretendard";
@@ -17,6 +19,21 @@ export const globalStyles = css`
     font-display: swap;
   }
 
+  :root,
+  :root[data-color-mode='light'] {
+    ${colorModeCssVariables.light}
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-color-mode='light']) {
+      ${colorModeCssVariables.dark}
+    }
+  }
+
+  :root[data-color-mode='dark'] {
+    ${colorModeCssVariables.dark}
+  }
+
   :root {
     font-family:
       "Pretendard",
@@ -24,11 +41,8 @@ export const globalStyles = css`
       sans-serif;
     line-height: 1.5;
     font-weight: 400;
-    color: #152021;
-    background:
-      radial-gradient(circle at top left, rgba(227, 198, 143, 0.32), transparent 34%),
-      radial-gradient(circle at top right, rgba(168, 196, 173, 0.28), transparent 28%),
-      linear-gradient(180deg, #f5efe4 0%, #eef2eb 100%);
+    color: ${color.text.primary};
+    background: ${color.bg.default};
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -63,6 +77,6 @@ export const globalStyles = css`
   }
 
   ::selection {
-    background: rgba(21, 32, 33, 0.16);
+    background: ${color.bg.weak};
   }
 `;

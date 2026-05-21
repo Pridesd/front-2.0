@@ -41,9 +41,9 @@ const Card = styled.div`
   width: min(520px, 100%);
   padding: 28px;
   border-radius: 28px;
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(21, 32, 33, 0.08);
-  box-shadow: 0 18px 60px rgba(18, 31, 28, 0.08);
+  background: ${({ theme }) => theme.color.bg.elevated};
+  border: 1px solid ${({ theme }) => theme.color.border.subtle};
+  box-shadow: 0 18px 60px ${({ theme }) => theme.color.bg.weak};
 `;
 
 const Title = styled.h2`
@@ -52,13 +52,13 @@ const Title = styled.h2`
 
 const Copy = styled.p`
   margin: 0;
-  color: #4c544d;
+  color: ${({ theme }) => theme.color.text.secondary};
 `;
 
 const BackLink = styled(Link)`
   width: fit-content;
   padding: 10px ${({ theme }) => theme.spacing.xl};
   border-radius: ${({ theme }) => theme.radius.full};
-  background: #152021;
-  color: #f8f4ea;
+  background: ${({ theme }) => theme.color.bg.inverse};
+  color: ${({ theme }) => theme.color.text.inverse};
 `;
