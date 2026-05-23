@@ -65,27 +65,21 @@ const Section = styled.section`
   gap: 18px;
   padding: 28px;
   border-radius: 32px;
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.95),
-      rgba(246, 238, 224, 0.92)
-    ),
-    rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(21, 32, 33, 0.08);
-  box-shadow: 0 20px 60px rgba(18, 31, 28, 0.08);
+  background: ${({ theme }) => theme.color.bg.elevated};
+  border: 1px solid ${({ theme }) => theme.color.border.subtle};
+  box-shadow: 0 20px 60px ${({ theme }) => theme.color.bg.weak};
 `;
 
 const Heading = styled.div`
   display: grid;
-  gap: 8px;
+  gap: ${({ theme }) => theme.spacing.md};
 `;
 
 const Label = styled.span`
   font-size: 0.78rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #6c705a;
+  color: ${({ theme }) => theme.color.text.tertiary};
 `;
 
 const Title = styled.h2`
@@ -98,7 +92,7 @@ const Title = styled.h2`
 const Description = styled.p`
   margin: 0;
   max-width: 58ch;
-  color: #39413a;
+  color: ${({ theme }) => theme.color.text.secondary};
   font-size: 1rem;
 `;
 
@@ -110,11 +104,11 @@ const Grid = styled.div`
 
 const Card = styled.article`
   display: grid;
-  gap: 8px;
+  gap: ${({ theme }) => theme.spacing.md};
   padding: 18px;
   border-radius: 22px;
-  background: rgba(21, 32, 33, 0.04);
-  border: 1px solid rgba(21, 32, 33, 0.08);
+  background: ${({ theme }) => theme.color.bg.subtle};
+  border: 1px solid ${({ theme }) => theme.color.border.subtle};
 `;
 
 const CardTitle = styled.h3`
@@ -124,5 +118,5 @@ const CardTitle = styled.h3`
 
 const CardCopy = styled.p`
   margin: 0;
-  color: #50584f;
+  color: ${({ theme }) => theme.color.text.tertiary};
 `;
