@@ -1,5 +1,25 @@
-import { Text } from "@/components";
+import { Icon, Text, type IconName } from "@/components";
 import styled from "@emotion/styled";
+
+import type { ColorToken } from "@/styles/tokens";
+
+const ICON_SIZES = [24, 20, 16, 12] as const;
+
+const ICON_EXAMPLES: ReadonlyArray<{ icon: IconName; color?: ColorToken }> = [
+  { icon: "chevron-down-lined" },
+  { icon: "chevron-left-lined" },
+  { icon: "chevron-right-lined" },
+  { icon: "chevron-up-lined" },
+  { icon: "delete-lined", color: "text.danger" },
+  { icon: "help-circle-filled", color: "bg.brand" },
+  { icon: "home-filled" },
+  { icon: "home-lined" },
+  { icon: "list-filled" },
+  { icon: "list-lined" },
+  { icon: "search-lined" },
+  { icon: "user-filled" },
+  { icon: "user-lined" },
+];
 
 export const HomePage = () => {
   return (
@@ -26,6 +46,35 @@ export const HomePage = () => {
           absorb the new page architecture.
         </Description>
       </Heading>
+      <IconShowcase>
+        <Text as="h3" font="heading-s-m">
+          Icons
+        </Text>
+        <IconTable>
+          <IconTableHeader>
+            <Text color="text.tertiary" font="detail-m-m">
+              Name
+            </Text>
+            {ICON_SIZES.map((size) => (
+              <Text key={size} align="center" color="text.tertiary" font="detail-m-m">
+                {size}px
+              </Text>
+            ))}
+          </IconTableHeader>
+          {ICON_EXAMPLES.map(({ color, icon }) => (
+            <IconTableRow key={icon}>
+              <Text color="text.secondary" font="detail-m-r">
+                {icon}
+              </Text>
+              {ICON_SIZES.map((size) => (
+                <IconCell key={`${icon}-${size}`}>
+                  <Icon color={color} icon={icon} size={size} />
+                </IconCell>
+              ))}
+            </IconTableRow>
+          ))}
+        </IconTable>
+      </IconShowcase>
       <Grid>
         <Card>
           <CardTitle>API types</CardTitle>
@@ -94,6 +143,44 @@ const Description = styled.p`
   max-width: 58ch;
   color: ${({ theme }) => theme.color.text.secondary};
   font-size: 1rem;
+`;
+
+const IconShowcase = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => theme.spacing.xl};
+  border-radius: ${({ theme }) => theme.radius.md};
+  background: ${({ theme }) => theme.color.bg.subtle};
+  border: 1px solid ${({ theme }) => theme.color.border.subtle};
+`;
+
+const IconTable = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.sm};
+  overflow-x: auto;
+`;
+
+const IconTableHeader = styled.div`
+  display: grid;
+  grid-template-columns: minmax(${({ theme }) => theme.pxToRem(180)}, 1fr) repeat(4, ${({ theme }) => theme.pxToRem(48)});
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
+  min-width: ${({ theme }) => theme.pxToRem(420)};
+`;
+
+const IconTableRow = styled.div`
+  display: grid;
+  grid-template-columns: minmax(${({ theme }) => theme.pxToRem(180)}, 1fr) repeat(4, ${({ theme }) => theme.pxToRem(48)});
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.md};
+  min-width: ${({ theme }) => theme.pxToRem(420)};
+  min-height: ${({ theme }) => theme.pxToRem(40)};
+`;
+
+const IconCell = styled.div`
+  display: grid;
+  place-items: center;
+  min-height: ${({ theme }) => theme.pxToRem(32)};
 `;
 
 const Grid = styled.div`
