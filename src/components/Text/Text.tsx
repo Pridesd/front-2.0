@@ -2,21 +2,20 @@ import type { ComponentPropsWithoutRef, CSSProperties, ElementType, ReactElement
 
 import styled from '@emotion/styled';
 
-import type { TypographyToken } from '@/styles/tokens';
+import { resolveColorToken, type ColorToken, type TypographyToken } from '@/styles/tokens';
 
 const DEFAULT_FONT = 'body-s-r' satisfies TypographyToken;
 
 type TextStyleProps = {
   $align?: CSSProperties['textAlign'];
-  $color?: CSSProperties['color'];
+  $color?: ColorToken;
   $font: TypographyToken;
 };
 
 export type TextProps<T extends ElementType = 'span'> = {
   align?: CSSProperties['textAlign'];
   as?: T;
-  // TODO: Replace raw CSS color values with a color token type after color tokens are added.
-  color?: CSSProperties['color'];
+  color?: ColorToken;
   font?: TypographyToken;
 } & Omit<ComponentPropsWithoutRef<T>, 'align' | 'as' | 'color' | 'font'>;
 
@@ -35,7 +34,7 @@ const StyledText = styled.span<TextStyleProps>(({ $align, $color, $font, theme }
 
   return {
     margin: 0,
-    color: $color,
+    color: $color ? resolveColorToken($color) : undefined,
     fontFamily: typography.fontFamily,
     fontSize: typography.fontSize,
     fontWeight: typography.fontWeight,

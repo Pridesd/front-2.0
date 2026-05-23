@@ -8,10 +8,15 @@ Keep `CLAUDE.md` and `AGENTS.md` aligned when changing agent instructions.
 - Prefer Emotion `theme` tokens before writing raw CSS values.
 - Use `theme.spacing` for spacing values that exist in the design system.
 - Use `theme.radius` for border radius values that exist in the design system.
+- Use semantic `theme.color` tokens for component colors.
 - Use `theme.pxToRem()` when a new rem value is needed from a px design spec.
 - Do not append `px` to `theme.spacing` or `theme.radius` values. They are already rem strings.
 - Use `theme.typography` or the shared `Text` component for typography whenever possible.
 - Keep existing raw values only when there is no matching token or changing the value would alter the visual design.
+- Do not use raw hex, rgba, or CSS color names in shared components.
+- Use primitive colors only for semantic token definitions, token documentation/swatch UI, or justified exceptions.
+- If primitive colors are used directly, leave a short reason because primitive values may change.
+- Use CSS variables and `data-color-mode` for light/dark behavior instead of hardcoding mode branches in components.
 - Do not invent new theme tokens inline inside components. Add them under `src/styles/tokens` and expose them through `src/styles/theme.ts`.
 - When extending theme fields, update `src/styles/emotion.d.ts` so styled components receive correct types.
 
@@ -19,8 +24,8 @@ Keep `CLAUDE.md` and `AGENTS.md` aligned when changing agent instructions.
 
 - Spacing and radius tokens are rem-based.
 - The rem conversion baseline is `16px = 1rem`.
-- `fontWeight`, `spacing`, `radius`, `typography`, and `pxToRem` are available from Emotion `theme`.
-- Color tokens are not defined yet, so raw color values are allowed until color tokens are added.
+- `fontWeight`, `spacing`, `radius`, `typography`, `pxToRem`, and `color` are available from Emotion `theme`.
+- Color tokens are semantic CSS variable references. Prefer `theme.color` in app UI and reserve `theme.colorPrimitive` for token infrastructure or documented exceptions.
 
 ## Shared Components
 
