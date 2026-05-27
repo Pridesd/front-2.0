@@ -12,5 +12,6 @@ declare module '@emotion/react' {
     radius: AppTheme['radius'];
     spacing: AppTheme['spacing'];
     typography: AppTheme['typography'];
+    zIndex: AppTheme['zIndex'];
   }
 }

@@ -35,7 +35,7 @@ const CheckBoxRoot = styled.span`
 const CheckBoxInput = styled.input`
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: ${({ theme }) => theme.zIndex.control};
   width: 100%;
   height: 100%;
   margin: 0;
