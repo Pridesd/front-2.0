@@ -1,8 +1,11 @@
 import {
   color,
   colorPrimitive,
+  effect,
   fontFamily,
   fontWeight,
+  gradient,
+  gradientBaseColor,
   pxToRem,
   radius,
   spacing,
@@ -13,8 +16,11 @@ import {
 export const theme = {
   color,
   colorPrimitive,
+  effect,
   fontFamily,
   fontWeight,
+  gradient,
+  gradientBaseColor,
   pxToRem,
   radius,
   spacing,
