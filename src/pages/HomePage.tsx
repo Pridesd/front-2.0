@@ -5,6 +5,7 @@ import styled from '@emotion/styled';
 
 import {
   CheckBox,
+  CONFIRM_POPUP_VARIANT,
   ConfirmPopup,
   Icon,
   IconButton,
@@ -285,7 +286,7 @@ const CONFIRM_POPUP_EXAMPLES = {
     description: '저장하지 않으면 지금 입력한 내용이 사라져요.',
     subtitle: '러닝 그룹',
     title: '변경사항을 저장할까요?',
-    variant: 'default',
+    variant: CONFIRM_POPUP_VARIANT.DEFAULT,
   },
   danger: {
     actionLabel: 'danger',
@@ -294,7 +295,7 @@ const CONFIRM_POPUP_EXAMPLES = {
     description: '삭제한 러닝 그룹은 다시 복구할 수 없어요.',
     subtitle: '러닝 그룹 삭제',
     title: '정말 삭제할까요?',
-    variant: 'danger',
+    variant: CONFIRM_POPUP_VARIANT.DANGER,
   },
   loading: {
     actionLabel: 'loading',
@@ -303,7 +304,7 @@ const CONFIRM_POPUP_EXAMPLES = {
     description: '초대 대상자에게 알림이 전송됩니다.',
     subtitle: '초대장 발송',
     title: '초대장을 보낼까요?',
-    variant: 'default',
+    variant: CONFIRM_POPUP_VARIANT.DEFAULT,
   },
 } as const;
 

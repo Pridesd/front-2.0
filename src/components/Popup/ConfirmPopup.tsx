@@ -6,6 +6,7 @@ import { Text } from '@/components/Text';
 import { resolveColorToken, type ColorToken } from '@/styles/tokens';
 
 import { Popup } from './Popup';
+import { CONFIRM_POPUP_INITIAL_FOCUS, CONFIRM_POPUP_VARIANT } from './ConfirmPopup.types';
 import type { ConfirmPopupProps } from './ConfirmPopup.types';
 
 export const ConfirmPopup = ({
@@ -18,14 +19,14 @@ export const ConfirmPopup = ({
   confirmLoading = false,
   confirmText = '확인',
   description,
-  initialFocus = 'cancel',
+  initialFocus = CONFIRM_POPUP_INITIAL_FOCUS.CANCEL,
   onCancel,
   onConfirm,
   onOpenChange,
   open,
   subtitle,
   title,
-  variant = 'default',
+  variant = CONFIRM_POPUP_VARIANT.DEFAULT,
 }: ConfirmPopupProps): ReactElement => {
   const titleId = useId();
   const descriptionId = useId();
@@ -41,9 +42,13 @@ export const ConfirmPopup = ({
 
     const frameId = window.requestAnimationFrame(() => {
       const primaryTarget =
-        initialFocus === 'confirm' ? confirmButtonRef.current : cancelButtonRef.current;
+        initialFocus === CONFIRM_POPUP_INITIAL_FOCUS.CONFIRM
+          ? confirmButtonRef.current
+          : cancelButtonRef.current;
       const secondaryTarget =
-        initialFocus === 'confirm' ? cancelButtonRef.current : confirmButtonRef.current;
+        initialFocus === CONFIRM_POPUP_INITIAL_FOCUS.CONFIRM
+          ? cancelButtonRef.current
+          : confirmButtonRef.current;
       const target =
         (primaryTarget && !primaryTarget.disabled && primaryTarget) ||
         (secondaryTarget && !secondaryTarget.disabled && secondaryTarget) ||
@@ -122,7 +127,7 @@ export const ConfirmPopup = ({
           </PopupButton>
           <PopupButton
             ref={confirmButtonRef}
-            $variant={variant === 'danger' ? 'danger' : 'primary'}
+            $variant={variant === CONFIRM_POPUP_VARIANT.DANGER ? 'danger' : 'primary'}
             aria-busy={confirmLoading}
             disabled={isConfirmDisabled}
             type="button"
