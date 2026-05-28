@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, type ReactElement, type ReactNode } from 'react';
+import { useEffect, useId, useRef, type ReactElement } from 'react';
 
 import styled from '@emotion/styled';
 
@@ -6,29 +6,7 @@ import { Text } from '@/components/Text';
 import { resolveColorToken, type ColorToken } from '@/styles/tokens';
 
 import { Popup } from './Popup';
-
-export type ConfirmPopupVariant = 'default' | 'danger';
-export type ConfirmPopupInitialFocus = 'cancel' | 'confirm';
-
-export type ConfirmPopupProps = {
-  open: boolean;
-  title: ReactNode;
-  subtitle?: ReactNode;
-  description?: ReactNode;
-  confirmText?: string;
-  cancelText?: string;
-  variant?: ConfirmPopupVariant;
-  confirmDisabled?: boolean;
-  confirmLoading?: boolean;
-  cancelDisabled?: boolean;
-  closeOnEscape?: boolean;
-  closeOnBackdropClick?: boolean;
-  initialFocus?: ConfirmPopupInitialFocus;
-  onConfirm: () => void;
-  onCancel: () => void;
-  onOpenChange?: (open: boolean) => void;
-  className?: string;
-};
+import type { ConfirmPopupProps } from './ConfirmPopup.types';
 
 export const ConfirmPopup = ({
   cancelDisabled = false,

@@ -3,6 +3,6 @@ export type {
   ConfirmPopupInitialFocus,
   ConfirmPopupProps,
   ConfirmPopupVariant,
-} from './ConfirmPopup';
+} from './ConfirmPopup.types';
 export { Popup } from './Popup';
 export type { PopupProps, PopupRole } from './Popup';
