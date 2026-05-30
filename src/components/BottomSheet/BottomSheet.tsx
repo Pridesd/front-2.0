@@ -11,27 +11,7 @@ import {
 import { IconButton } from '@/components/Icon';
 import { Text } from '@/components/Text';
 
-export type BottomSheetHeading = {
-  title: ReactNode;
-  subtitle?: ReactNode;
-  description?: ReactNode;
-};
-
-export type BottomSheetProps = {
-  open: boolean;
-  onOpenChange?: (open: boolean) => void;
-  onClose?: () => void;
-  topBarTitle?: ReactNode;
-  heading?: BottomSheetHeading;
-  ariaLabel?: string;
-  children?: ReactNode;
-  footer?: ReactNode;
-  isCloseButtonHidden?: boolean;
-  isBackdropCloseDisabled?: boolean;
-  isEscapeCloseDisabled?: boolean;
-  maxHeight?: string;
-  className?: string;
-};
+import type { BottomSheetProps } from './BottomSheet.types';
 
 const DEFAULT_MAX_HEIGHT = 'calc(100dvh - 48px)';
 
