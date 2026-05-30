@@ -57,13 +57,12 @@ export const BottomSheet = ({
   const hasHeadingTitle = isRenderable(heading?.title);
   const hasHeadingDescription = isRenderable(heading?.description);
   const hasTopBar = hasTopBarTitle || !isCloseButtonHidden;
-  let labelledById: string | undefined;
-
-  if (hasHeadingTitle) {
-    labelledById = headingTitleId;
-  } else if (hasTopBarTitle) {
-    labelledById = topBarTitleId;
-  }
+  const labelledById = getLabelledById({
+    hasHeadingTitle,
+    headingTitleId,
+    hasTopBarTitle,
+    topBarTitleId,
+  });
 
   const handleOpenChange = (nextOpen: boolean) => {
     onOpenChange?.(nextOpen);
@@ -156,6 +155,30 @@ export const BottomSheet = ({
 
 const isRenderable = (value: ReactNode): boolean =>
   value !== undefined && value !== null && value !== false && value !== '';
+
+type LabelledByIdOptions = {
+  hasHeadingTitle: boolean;
+  headingTitleId: string;
+  hasTopBarTitle: boolean;
+  topBarTitleId: string;
+};
+
+const getLabelledById = ({
+  hasHeadingTitle,
+  headingTitleId,
+  hasTopBarTitle,
+  topBarTitleId,
+}: LabelledByIdOptions): string | undefined => {
+  if (hasHeadingTitle) {
+    return headingTitleId;
+  }
+
+  if (hasTopBarTitle) {
+    return topBarTitleId;
+  }
+
+  return undefined;
+};
 
 const overlayEnter = keyframes`
   from {
