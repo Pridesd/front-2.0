@@ -1,9 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
-import { Icon, IconButton, Text, type IconButtonShape, type IconName } from '@/components';
+import {
+  BottomSheet,
+  CheckBox,
+  CONFIRM_POPUP_VARIANT,
+  ConfirmPopup,
+  Icon,
+  IconButton,
+  PageLayout,
+  Text,
+  type IconButtonShape,
+  type IconName,
+  type PageLayoutBackground,
+} from '@/components';
 import {
   colorModeCssVariables,
   type ColorMode,
@@ -12,6 +24,24 @@ import {
 } from '@/styles/tokens';
 
 const ICON_SIZES = [24, 20, 16, 12] as const;
+
+type PageBackgroundOption = {
+  background: PageLayoutBackground;
+  label: string;
+};
+
+const COLOR_BACKGROUND_OPTIONS: ReadonlyArray<PageBackgroundOption> = [
+  { background: 'bg.default', label: 'Default' },
+  { background: 'bg.subtle', label: 'Subtle' },
+  { background: 'bg.surface', label: 'Surface' },
+  { background: 'bg.brand-soft', label: 'Brand soft' },
+];
+
+const GRADIENT_BACKGROUND_OPTIONS: ReadonlyArray<PageBackgroundOption> = [
+  { background: 'gradient.bg.subtle', label: 'Subtle' },
+  { background: 'gradient.bg.brand-main', label: 'Brand main' },
+  { background: 'gradient.bg.brand-event', label: 'Brand event' },
+];
 
 const TEXT_EXAMPLES: ReadonlyArray<{ font: TypographyToken; label: string; sample: string }> = [
   { font: 'display-l', label: 'display-l', sample: 'GuideRun' },
@@ -25,6 +55,7 @@ const TEXT_EXAMPLES: ReadonlyArray<{ font: TypographyToken; label: string; sampl
   { font: 'heading-s-m', label: 'heading-s-m', sample: 'Heading Small Medium' },
   { font: 'body-l-b', label: 'body-l-b', sample: 'Body Large Bold' },
   { font: 'body-l-sb', label: 'body-l-sb', sample: 'Body Large Semibold' },
+  { font: 'body-l-m', label: 'body-l-m', sample: 'Body Large Medium' },
   { font: 'body-m-sb', label: 'body-m-sb', sample: 'Body Medium Semibold' },
   { font: 'body-m-m', label: 'body-m-m', sample: 'Body Medium Medium' },
   { font: 'body-s-sb', label: 'body-s-sb', sample: 'Body Small Semibold' },
@@ -53,11 +84,13 @@ const TEXT_CODE_EXAMPLES = [
 ] as const;
 
 const ICON_EXAMPLES: ReadonlyArray<{ icon: IconName; color?: ColorToken }> = [
+  { icon: 'calendar-lined', color: 'icon.secondary' },
   { icon: 'check-lined', color: 'text.brand' },
   { icon: 'chevron-down-lined' },
   { icon: 'chevron-left-lined' },
   { icon: 'chevron-right-lined' },
   { icon: 'chevron-up-lined' },
+  { icon: 'delete-filled', color: 'text.danger' },
   { icon: 'delete-lined', color: 'text.danger' },
   { icon: 'download-lined', color: 'icon.secondary' },
   { icon: 'edit-lined', color: 'icon.secondary' },
@@ -67,10 +100,12 @@ const ICON_EXAMPLES: ReadonlyArray<{ icon: IconName; color?: ColorToken }> = [
   { icon: 'link-lined', color: 'text.brand' },
   { icon: 'list-filled' },
   { icon: 'list-lined' },
+  { icon: 'map-lined', color: 'text.brand' },
   { icon: 'more-vertical-lined' },
   { icon: 'plus-lined', color: 'text.brand' },
   { icon: 'search-lined' },
   { icon: 'share-lined', color: 'icon.secondary' },
+  { icon: 'shuffle-lined', color: 'icon.secondary' },
   { icon: 'trash-lined', color: 'text.danger' },
   { icon: 'user-filled' },
   { icon: 'user-lined' },
@@ -214,6 +249,160 @@ const ICON_BUTTON_CODE_EXAMPLES = [
   },
 ] as const;
 
+const CHECKBOX_EXAMPLES: ReadonlyArray<{
+  defaultChecked?: boolean;
+  disabled?: boolean;
+  label: string;
+}> = [
+  { label: 'Unchecked' },
+  { defaultChecked: true, label: 'Checked' },
+  { disabled: true, label: 'Disabled unchecked' },
+  { defaultChecked: true, disabled: true, label: 'Disabled checked' },
+];
+
+const CHECKBOX_CODE_EXAMPLES = [
+  {
+    label: 'Label wrapper',
+    code: `<label>
+  <CheckBox checked={checked} onChange={handleChange} />
+  <Text>전체 동의</Text>
+</label>`,
+  },
+  {
+    label: 'Standalone',
+    code: `<CheckBox
+  aria-label="공지 선택"
+  checked={checked}
+  onChange={handleChange}
+/>`,
+  },
+] as const;
+
+const CONFIRM_POPUP_CODE_EXAMPLES = [
+  {
+    label: 'Default',
+    code: `<ConfirmPopup
+  open={open}
+  subtitle="러닝 그룹"
+  title="변경사항을 저장할까요?"
+  description="저장하지 않으면 지금 입력한 내용이 사라져요."
+  onCancel={close}
+  onConfirm={save}
+/>`,
+  },
+  {
+    label: 'Loading',
+    code: `<ConfirmPopup
+  open={open}
+  title="초대장을 보낼까요?"
+  confirmText="보내기"
+  confirmLoading={isSending}
+  onCancel={close}
+  onConfirm={sendInvite}
+/>`,
+  },
+] as const;
+
+const BOTTOM_SHEET_CODE_EXAMPLES = [
+  {
+    label: 'Heading and footer',
+    code: `<BottomSheet
+  open={open}
+  heading={{
+    subtitle: '서브 타이틀',
+    title: '타이틀을 작성해주세요',
+    description: '설명을 작성해주세요',
+  }}
+  footer={<Button>다음</Button>}
+  isBackdropCloseDisabled
+  onOpenChange={setOpen}
+>
+  <FormContent />
+</BottomSheet>`,
+  },
+  {
+    label: 'Top bar list',
+    code: `<BottomSheet
+  open={open}
+  topBarTitle="러닝 모집 관리"
+  onOpenChange={setOpen}
+>
+  <ActionList />
+</BottomSheet>`,
+  },
+  {
+    label: 'Label only',
+    code: `<BottomSheet
+  open={open}
+  ariaLabel="공유 옵션"
+  onOpenChange={setOpen}
+>
+  <ShareOptions />
+</BottomSheet>`,
+  },
+  {
+    label: 'Scrollable content',
+    code: `<BottomSheet
+  open={open}
+  maxHeight="26.25rem"
+  heading={{ title: '긴 콘텐츠 예시' }}
+  footer={<Button>고정 Footer</Button>}
+  onOpenChange={setOpen}
+>
+  <LongContent />
+</BottomSheet>`,
+  },
+] as const;
+
+const SCROLL_BOTTOM_SHEET_ITEMS = [
+  '러닝 이름',
+  '러닝 날짜',
+  '집결 장소',
+  '모집 인원',
+  '러닝 거리',
+  '평균 페이스',
+  '준비물',
+  '참가비',
+  '환불 안내',
+  '안전 수칙',
+  '뒤풀이 여부',
+  '추가 공지',
+] as const;
+
+const CONFIRM_POPUP_EXAMPLES = {
+  default: {
+    actionLabel: 'default',
+    buttonLabel: 'Open default',
+    confirmText: '저장',
+    description: '저장하지 않으면 지금 입력한 내용이 사라져요.',
+    subtitle: '러닝 그룹',
+    title: '변경사항을 저장할까요?',
+    variant: CONFIRM_POPUP_VARIANT.DEFAULT,
+  },
+  danger: {
+    actionLabel: 'danger',
+    buttonLabel: 'Open danger',
+    confirmText: '삭제',
+    description: '삭제한 러닝 그룹은 다시 복구할 수 없어요.',
+    subtitle: '러닝 그룹 삭제',
+    title: '정말 삭제할까요?',
+    variant: CONFIRM_POPUP_VARIANT.DANGER,
+  },
+  loading: {
+    actionLabel: 'loading',
+    buttonLabel: 'Open loading',
+    confirmText: '보내기',
+    description: '초대 대상자에게 알림이 전송됩니다.',
+    subtitle: '초대장 발송',
+    title: '초대장을 보낼까요?',
+    variant: CONFIRM_POPUP_VARIANT.DEFAULT,
+  },
+} as const;
+
+type ConfirmPopupExample = keyof typeof CONFIRM_POPUP_EXAMPLES;
+
+type BottomSheetExample = 'heading' | 'list' | 'scroll';
+
 type CodeExample = {
   label: string;
   code: string;
@@ -221,13 +410,106 @@ type CodeExample = {
 
 export const HomePage = () => {
   const [colorMode, setColorMode] = useState<ColorMode>('light');
+  const [pageBackground, setPageBackground] = useState<PageLayoutBackground>('bg.subtle');
+  const [isCheckBoxSelected, setIsCheckBoxSelected] = useState(false);
+  const [activeConfirmPopup, setActiveConfirmPopup] = useState<ConfirmPopupExample | null>(null);
+  const [activeBottomSheet, setActiveBottomSheet] = useState<BottomSheetExample | null>(null);
+  const [isConfirmPopupLoading, setIsConfirmPopupLoading] = useState(false);
+  const [lastConfirmPopupAction, setLastConfirmPopupAction] = useState('Last action: none');
+  const confirmPopupLoadingTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const previousColorMode = root.getAttribute('data-color-mode');
+
+    root.setAttribute('data-color-mode', colorMode);
+
+    return () => {
+      if (previousColorMode) {
+        root.setAttribute('data-color-mode', previousColorMode);
+        return;
+      }
+
+      root.removeAttribute('data-color-mode');
+    };
+  }, [colorMode]);
+
+  useEffect(() => {
+    return () => {
+      if (confirmPopupLoadingTimerRef.current !== null) {
+        window.clearTimeout(confirmPopupLoadingTimerRef.current);
+      }
+    };
+  }, []);
+
+  const clearConfirmPopupLoadingTimer = () => {
+    if (confirmPopupLoadingTimerRef.current === null) {
+      return;
+    }
+
+    window.clearTimeout(confirmPopupLoadingTimerRef.current);
+    confirmPopupLoadingTimerRef.current = null;
+  };
 
   const handleToggleColorMode = () => {
     setColorMode((currentMode) => (currentMode === 'light' ? 'dark' : 'light'));
   };
 
+  const handleOpenConfirmPopup = (example: ConfirmPopupExample) => {
+    clearConfirmPopupLoadingTimer();
+    setIsConfirmPopupLoading(false);
+    setActiveConfirmPopup(example);
+  };
+
+  const handleOpenBottomSheet = (example: BottomSheetExample) => {
+    setActiveBottomSheet(example);
+  };
+
+  const handleCloseBottomSheet = () => {
+    setActiveBottomSheet(null);
+  };
+
+  const handleCancelConfirmPopup = () => {
+    const actionLabel = activeConfirmPopup
+      ? CONFIRM_POPUP_EXAMPLES[activeConfirmPopup].actionLabel
+      : 'popup';
+
+    clearConfirmPopupLoadingTimer();
+    setIsConfirmPopupLoading(false);
+    setLastConfirmPopupAction(`Last action: ${actionLabel} canceled`);
+    setActiveConfirmPopup(null);
+  };
+
+  const handleConfirmPopup = () => {
+    if (!activeConfirmPopup) {
+      return;
+    }
+
+    const actionLabel = CONFIRM_POPUP_EXAMPLES[activeConfirmPopup].actionLabel;
+
+    if (activeConfirmPopup !== 'loading') {
+      setLastConfirmPopupAction(`Last action: ${actionLabel} confirmed`);
+      setActiveConfirmPopup(null);
+      return;
+    }
+
+    setIsConfirmPopupLoading(true);
+    setLastConfirmPopupAction('Last action: loading started');
+    clearConfirmPopupLoadingTimer();
+    confirmPopupLoadingTimerRef.current = window.setTimeout(() => {
+      setIsConfirmPopupLoading(false);
+      setLastConfirmPopupAction(`Last action: ${actionLabel} confirmed`);
+      setActiveConfirmPopup(null);
+      confirmPopupLoadingTimerRef.current = null;
+    }, 1200);
+  };
+
+  const activeConfirmPopupExample = activeConfirmPopup
+    ? CONFIRM_POPUP_EXAMPLES[activeConfirmPopup]
+    : null;
+
   return (
-    <Page $colorMode={colorMode} data-color-mode={colorMode}>
+    <Page $colorMode={colorMode} background={pageBackground} data-color-mode={colorMode}>
       <Header>
         <HeaderCopy>
           <Text as="h1" font="heading-l-b">
@@ -237,9 +519,43 @@ export const HomePage = () => {
             Shared UI primitives currently available in the app.
           </Text>
         </HeaderCopy>
-        <ThemeToggle type="button" onClick={handleToggleColorMode}>
-          {colorMode === 'light' ? 'Dark mode' : 'Light mode'}
-        </ThemeToggle>
+        <HeaderControls>
+          <ThemeToggle type="button" onClick={handleToggleColorMode}>
+            {colorMode === 'light' ? 'Dark mode' : 'Light mode'}
+          </ThemeToggle>
+          <BackgroundControls aria-label="Page background">
+            <BackgroundOptionGroup aria-label="Color background" role="group">
+              <BackgroundGroupLabel>bg</BackgroundGroupLabel>
+              <BackgroundOptions>
+                {COLOR_BACKGROUND_OPTIONS.map(({ background, label }) => (
+                  <BackgroundOption
+                    key={background}
+                    aria-pressed={pageBackground === background}
+                    type="button"
+                    onClick={() => setPageBackground(background)}
+                  >
+                    {label}
+                  </BackgroundOption>
+                ))}
+              </BackgroundOptions>
+            </BackgroundOptionGroup>
+            <BackgroundOptionGroup aria-label="Gradient background" role="group">
+              <BackgroundGroupLabel>gradient bg</BackgroundGroupLabel>
+              <BackgroundOptions>
+                {GRADIENT_BACKGROUND_OPTIONS.map(({ background, label }) => (
+                  <BackgroundOption
+                    key={background}
+                    aria-pressed={pageBackground === background}
+                    type="button"
+                    onClick={() => setPageBackground(background)}
+                  >
+                    {label}
+                  </BackgroundOption>
+                ))}
+              </BackgroundOptions>
+            </BackgroundOptionGroup>
+          </BackgroundControls>
+        </HeaderControls>
       </Header>
 
       <ShowcaseSection>
@@ -332,6 +648,199 @@ export const HomePage = () => {
         </IconButtonGrid>
         <CodeExamples examples={ICON_BUTTON_CODE_EXAMPLES} />
       </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            CheckBox
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Unchecked, checked, disabled
+          </Text>
+        </SectionTitle>
+        <CheckBoxGrid>
+          {CHECKBOX_EXAMPLES.map(({ defaultChecked, disabled, label }) => (
+            <CheckBoxSample key={label} $disabled={disabled}>
+              <CheckBox defaultChecked={defaultChecked} disabled={disabled} />
+              <Text color={disabled ? 'text.disabled' : 'text.secondary'} font="detail-m-r">
+                {label}
+              </Text>
+            </CheckBoxSample>
+          ))}
+        </CheckBoxGrid>
+        <InteractiveCheckBoxSample>
+          <CheckBox
+            checked={isCheckBoxSelected}
+            onChange={(event) => setIsCheckBoxSelected(event.target.checked)}
+          />
+          <Text font="body-s-r">Interactive sample</Text>
+        </InteractiveCheckBoxSample>
+        <CodeExamples examples={CHECKBOX_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            ConfirmPopup
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Default, danger, loading
+          </Text>
+        </SectionTitle>
+        <PopupSampleGrid>
+          {(Object.keys(CONFIRM_POPUP_EXAMPLES) as ConfirmPopupExample[]).map((example) => (
+            <SampleButton
+              key={example}
+              type="button"
+              onClick={() => handleOpenConfirmPopup(example)}
+            >
+              {CONFIRM_POPUP_EXAMPLES[example].buttonLabel}
+            </SampleButton>
+          ))}
+        </PopupSampleGrid>
+        <Text color="text.secondary" font="body-s-r">
+          {lastConfirmPopupAction}
+        </Text>
+        <CodeExamples examples={CONFIRM_POPUP_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      <ShowcaseSection>
+        <SectionTitle>
+          <Text as="h2" font="heading-s-m">
+            BottomSheet
+          </Text>
+          <Text color="text.tertiary" font="detail-m-r">
+            Heading, top bar, fixed footer
+          </Text>
+        </SectionTitle>
+        <PopupSampleGrid>
+          <SampleButton type="button" onClick={() => handleOpenBottomSheet('heading')}>
+            Open heading sheet
+          </SampleButton>
+          <SampleButton type="button" onClick={() => handleOpenBottomSheet('list')}>
+            Open action list
+          </SampleButton>
+          <SampleButton type="button" onClick={() => handleOpenBottomSheet('scroll')}>
+            Open scroll footer
+          </SampleButton>
+        </PopupSampleGrid>
+        <CodeExamples examples={BOTTOM_SHEET_CODE_EXAMPLES} />
+      </ShowcaseSection>
+
+      {activeConfirmPopupExample ? (
+        <ConfirmPopup
+          confirmLoading={activeConfirmPopup === 'loading' && isConfirmPopupLoading}
+          confirmText={activeConfirmPopupExample.confirmText}
+          description={activeConfirmPopupExample.description}
+          open={activeConfirmPopup !== null}
+          subtitle={activeConfirmPopupExample.subtitle}
+          title={activeConfirmPopupExample.title}
+          variant={activeConfirmPopupExample.variant}
+          onCancel={handleCancelConfirmPopup}
+          onConfirm={handleConfirmPopup}
+          onOpenChange={(nextOpen) => {
+            if (!nextOpen) {
+              setActiveConfirmPopup(null);
+            }
+          }}
+        />
+      ) : null}
+
+      <BottomSheet
+        footer={
+          <BottomSheetFooterButton type="button" onClick={handleCloseBottomSheet}>
+            다음
+          </BottomSheetFooterButton>
+        }
+        heading={{
+          subtitle: '서브 타이틀',
+          title: '타이틀을 작성해주세요',
+          description: '설명을 작성해주세요',
+        }}
+        isBackdropCloseDisabled
+        open={activeBottomSheet === 'heading'}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) {
+            handleCloseBottomSheet();
+          }
+        }}
+      >
+        <BottomSheetFormContent>
+          <DemoField aria-label="이름" placeholder="이름" />
+          <DemoFieldInfo>
+            <Text color="text.tertiary" font="detail-m-m">
+              안내 메시지
+            </Text>
+            <Text color="text.tertiary" font="detail-m-r">
+              <Text as="span" color="text.brand" font="detail-m-m">
+                0
+              </Text>
+              /00자
+            </Text>
+          </DemoFieldInfo>
+        </BottomSheetFormContent>
+      </BottomSheet>
+
+      <BottomSheet
+        open={activeBottomSheet === 'list'}
+        topBarTitle="러닝 모집 관리"
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) {
+            handleCloseBottomSheet();
+          }
+        }}
+      >
+        <BottomSheetActionList aria-label="러닝 모집 관리 작업">
+          <BottomSheetActionItem type="button" onClick={handleCloseBottomSheet}>
+            <Icon aria-hidden={true} color="icon.secondary" icon="list-lined" size={20} />
+            <Text font="body-m-m">모집 마감하기</Text>
+          </BottomSheetActionItem>
+          <BottomSheetActionItem type="button" onClick={handleCloseBottomSheet}>
+            <Icon aria-hidden={true} color="icon.secondary" icon="edit-lined" size={20} />
+            <Text font="body-m-m">모집 게시글 수정하기</Text>
+          </BottomSheetActionItem>
+          <BottomSheetActionItem type="button" onClick={handleCloseBottomSheet}>
+            <Icon aria-hidden={true} color="text.danger" icon="trash-lined" size={20} />
+            <Text color="text.danger" font="body-m-m">
+              모집 게시글 삭제하기
+            </Text>
+          </BottomSheetActionItem>
+          <BottomSheetActionItem type="button" onClick={handleCloseBottomSheet}>
+            <Icon aria-hidden={true} color="icon.secondary" icon="download-lined" size={20} />
+            <Text font="body-m-m">출석 인원 명단 추출</Text>
+          </BottomSheetActionItem>
+        </BottomSheetActionList>
+      </BottomSheet>
+
+      <BottomSheet
+        footer={
+          <BottomSheetFooterButton type="button" onClick={handleCloseBottomSheet}>
+            고정 Footer
+          </BottomSheetFooterButton>
+        }
+        heading={{
+          title: '긴 콘텐츠 예시',
+          description: '항목이 많아져도 하단 액션은 같은 자리에 유지됩니다.',
+        }}
+        maxHeight="26.25rem"
+        open={activeBottomSheet === 'scroll'}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) {
+            handleCloseBottomSheet();
+          }
+        }}
+      >
+        <BottomSheetScrollContent>
+          {SCROLL_BOTTOM_SHEET_ITEMS.map((label, index) => (
+            <BottomSheetScrollItem key={label}>
+              <Text color="text.tertiary" font="detail-m-m">
+                {String(index + 1).padStart(2, '0')}
+              </Text>
+              <Text font="body-m-m">{label}</Text>
+            </BottomSheetScrollItem>
+          ))}
+        </BottomSheetScrollContent>
+      </BottomSheet>
     </Page>
   );
 };
@@ -355,26 +864,37 @@ const getModeVariables = (mode: ColorMode) => css`
   ${colorModeCssVariables[mode]}
 `;
 
-const Page = styled.main<{ $colorMode: ColorMode }>`
+const Page = styled(PageLayout)<{ $colorMode: ColorMode }>`
   ${({ $colorMode }) => getModeVariables($colorMode)}
   display: grid;
   gap: ${({ theme }) => theme.spacing.xl};
-  min-height: 100vh;
   padding: ${({ theme }) => theme.spacing['3xl']};
+  padding-top: calc(env(safe-area-inset-top) + ${({ theme }) => theme.spacing['3xl']});
+  padding-bottom: calc(
+    env(safe-area-inset-bottom) + var(--app-fixed-bottom-offset, 0rem) +
+      ${({ theme }) => theme.spacing['3xl']}
+  );
   color: ${({ theme }) => theme.color.text.primary};
-  background: ${({ theme }) => theme.color.bg.default};
 `;
 
 const Header = styled.header`
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: ${({ theme }) => theme.spacing.xl};
 `;
 
 const HeaderCopy = styled.div`
   display: grid;
   gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const HeaderControls = styled.div`
+  display: grid;
+  justify-content: flex-end;
+  justify-items: flex-end;
+  gap: ${({ theme }) => theme.spacing.md};
 `;
 
 const ThemeToggle = styled.button`
@@ -393,6 +913,76 @@ const ThemeToggle = styled.button`
   &:focus-visible {
     outline: 2px solid ${({ theme }) => theme.color.border.focused};
     outline-offset: ${({ theme }) => theme.spacing.xs};
+  }
+`;
+
+const BackgroundControls = styled.div`
+  display: grid;
+  justify-items: flex-end;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const BackgroundOptionGroup = styled.div`
+  display: grid;
+  justify-items: flex-end;
+  gap: ${({ theme }) => theme.spacing.xs};
+`;
+
+const BackgroundGroupLabel = styled.span`
+  color: ${({ theme }) => theme.color.text.tertiary};
+  font-family: ${({ theme }) => theme.typography['detail-m-m'].fontFamily};
+  font-size: ${({ theme }) => theme.typography['detail-m-m'].fontSize};
+  font-weight: ${({ theme }) => theme.typography['detail-m-m'].fontWeight};
+  letter-spacing: ${({ theme }) => theme.typography['detail-m-m'].letterSpacing};
+  line-height: ${({ theme }) => theme.typography['detail-m-m'].lineHeight};
+`;
+
+const BackgroundOptions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const BackgroundOption = styled.button`
+  min-height: ${({ theme }) => theme.pxToRem(36)};
+  padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.lg}`};
+  border: 1px solid ${({ theme }) => theme.color.border.subtle};
+  border-radius: ${({ theme }) => theme.radius.full};
+  color: ${({ theme }) => theme.color.text.secondary};
+  background: ${({ theme }) => theme.color.bg.surface};
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease,
+    transform 120ms ease;
+
+  &[aria-pressed='true'] {
+    border-color: ${({ theme }) => theme.color.border.brand};
+    color: ${({ theme }) => theme.color.text.brand};
+    background: ${({ theme }) => theme.color.bg['brand-soft']};
+  }
+
+  &:hover {
+    border-color: ${({ theme }) => theme.color.border.default};
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.color.border.focused};
+    outline-offset: ${({ theme }) => theme.spacing.xs};
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:active {
+      transform: none;
+    }
   }
 `;
 
@@ -464,6 +1054,208 @@ const IconButtonSample = styled.div`
   display: inline-grid;
   justify-items: center;
   gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const CheckBoxGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, ${({ theme }) => theme.pxToRem(180)}), 1fr));
+  gap: ${({ theme }) => theme.spacing.md};
+`;
+
+const CheckBoxSample = styled.label<{ $disabled?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: ${({ theme }) => theme.pxToRem(32)};
+  gap: ${({ theme }) => theme.spacing.md};
+  cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
+`;
+
+const InteractiveCheckBoxSample = styled.label`
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: ${({ theme }) => theme.pxToRem(32)};
+  gap: ${({ theme }) => theme.spacing.md};
+  cursor: pointer;
+`;
+
+const PopupSampleGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.md};
+`;
+
+const SampleButton = styled.button`
+  min-height: ${({ theme }) => theme.pxToRem(40)};
+  padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.xl}`};
+  border: 1px solid ${({ theme }) => theme.color.border.subtle};
+  border-radius: ${({ theme }) => theme.radius.full};
+  color: ${({ theme }) => theme.color.text.primary};
+  background: ${({ theme }) => theme.color.bg.surface};
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    transform 120ms ease;
+
+  &:hover {
+    background: ${({ theme }) => theme.color.bg.subtle};
+    border-color: ${({ theme }) => theme.color.border.default};
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.color.border.focused};
+    outline-offset: ${({ theme }) => theme.spacing.xs};
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:active {
+      transform: none;
+    }
+  }
+`;
+
+const BottomSheetFormContent = styled.div`
+  display: grid;
+  gap: ${({ theme }) => theme.spacing.md};
+  width: 100%;
+  padding: ${({ theme }) => `${theme.spacing.none} ${theme.spacing['2xl']} ${theme.spacing['3xl']}`};
+`;
+
+const DemoField = styled.input`
+  width: 100%;
+  min-height: ${({ theme }) => theme.pxToRem(74)};
+  padding: ${({ theme }) => theme.spacing.xl};
+  border: 1px solid ${({ theme }) => theme.color.border.subtle};
+  border-radius: ${({ theme }) => theme.radius.md};
+  color: ${({ theme }) => theme.color.text.primary};
+  background: ${({ theme }) => theme.color.bg.default};
+  ${({ theme }) => theme.typography['heading-s-m']}
+
+  &::placeholder {
+    color: ${({ theme }) => theme.color.text.tertiary};
+  }
+
+  &:focus {
+    outline: 2px solid ${({ theme }) => theme.color.border.focused};
+    outline-offset: ${({ theme }) => theme.spacing.xs};
+  }
+`;
+
+const DemoFieldInfo = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: ${({ theme }) => theme.spacing.lg};
+`;
+
+const BottomSheetFooterButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: ${({ theme }) => theme.pxToRem(54)};
+  padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.xl}`};
+  border: 1px solid ${({ theme }) => theme.color.border.brand};
+  border-radius: ${({ theme }) => theme.radius.md};
+  color: ${({ theme }) => theme.color.text.inverse};
+  background: ${({ theme }) => theme.color.bg.brand};
+  cursor: pointer;
+  ${({ theme }) => theme.typography['body-l-b']}
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+
+  &:hover {
+    opacity: 0.88;
+  }
+
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.color.border.focused};
+    outline-offset: ${({ theme }) => theme.spacing.xs};
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:active {
+      transform: none;
+    }
+  }
+`;
+
+const BottomSheetActionList = styled.div`
+  display: grid;
+  width: 100%;
+  padding: ${({ theme }) => `${theme.spacing.none} ${theme.spacing.none} ${theme.spacing['3xl']}`};
+`;
+
+const BottomSheetActionItem = styled.button`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: ${({ theme }) => theme.pxToRem(56)};
+  gap: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => `${theme.spacing.xl} ${theme.spacing['2xl']}`};
+  border: 0;
+  color: ${({ theme }) => theme.color.text.primary};
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background-color 120ms ease,
+    transform 120ms ease;
+
+  &:hover {
+    background: ${({ theme }) => theme.color.bg.subtle};
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.color.border.focused};
+    outline-offset: ${({ theme }) => `-${theme.spacing.sm}`};
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:active {
+      transform: none;
+    }
+  }
+`;
+
+const BottomSheetScrollContent = styled.div`
+  display: grid;
+  width: 100%;
+  padding: ${({ theme }) => `${theme.spacing.none} ${theme.spacing['2xl']} ${theme.spacing['3xl']}`};
+`;
+
+const BottomSheetScrollItem = styled.div`
+  display: flex;
+  align-items: center;
+  min-height: ${({ theme }) => theme.pxToRem(64)};
+  gap: ${({ theme }) => theme.spacing.lg};
+  border-bottom: 1px solid ${({ theme }) => theme.color.border.subtle};
+
+  &:last-of-type {
+    border-bottom: 0;
+  }
 `;
 
 const CodeExampleGrid = styled.div`
