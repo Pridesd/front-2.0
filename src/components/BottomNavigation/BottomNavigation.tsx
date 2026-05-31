@@ -42,7 +42,7 @@ const BOTTOM_NAVIGATION_ITEMS = [
   },
 ] as const satisfies readonly BottomNavigationItem[];
 
-export type BottomNavigationProps = {
+type BottomNavigationProps = {
   className?: string;
 };
 
